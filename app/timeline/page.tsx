@@ -1,160 +1,157 @@
-"use client";
+'use client';
 
-import BottomNav from "@/components/BottomNav";
-import GlassCard from "@/components/GlassCard";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import AppShell from '@/components/AppShell';
+import GlassCard from '@/components/GlassCard';
+import { getUserProfile } from '@/lib/utils';
+import { mockDaeWun } from '@/data/mockData';
 
-const DAEWUN = [
-  { startAge: 3, endAge: 13, gan: "甲", ji: "子", theme: "배움과 기초", desc: "지식과 기초 역량을 다지는 시기", score: 72, isCurrent: false },
-  { startAge: 13, endAge: 23, gan: "乙", ji: "丑", theme: "성장과 탐색", desc: "자신의 가능성을 넓히며 다양한 경험을 쌓는 시기", score: 78, isCurrent: false },
-  { startAge: 23, endAge: 33, gan: "丙", ji: "寅", theme: "도전과 확장", desc: "사회적 기반을 다지고 커리어를 구축하는 활발한 시기", score: 88, isCurrent: true },
-  { startAge: 33, endAge: 43, gan: "丁", ji: "卯", theme: "성숙과 수확", desc: "이전의 노력이 결실을 맺기 시작하는 시기", score: 92, isCurrent: false },
-  { startAge: 43, endAge: 53, gan: "戊", ji: "辰", theme: "전환과 지혜", desc: "내면의 성숙이 깊어지고 새로운 방향을 모색하는 시기", score: 80, isCurrent: false },
-  { startAge: 53, endAge: 63, gan: "己", ji: "巳", theme: "안정과 완성", desc: "삶의 균형을 찾고 주변과 조화를 이루는 시기", score: 75, isCurrent: false },
-];
+const elementColors: Record<string, string> = {
+  수: '#93C5FD',
+  목: '#6EE7B7',
+  화: '#FB923C',
+  토: '#FCD34D',
+  금: '#E2E8F0',
+};
 
-const MAX_SCORE = 92;
+const energyLabels: Record<string, { label: string; color: string }> = {
+  rising: { label: '상승', color: '#6EE7B7' },
+  peak: { label: '최고', color: '#FCD34D' },
+  stable: { label: '안정', color: '#C4B5FD' },
+  falling: { label: '하강', color: '#F9A8D4' },
+};
 
 export default function TimelinePage() {
-  return (
-    <div className="relative min-h-screen bg-[#08090D] pb-28">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-10 right-0 w-64 h-64 rounded-full bg-violet-700/12 blur-3xl" />
-        <div className="absolute bottom-40 left-0 w-48 h-48 rounded-full bg-pink-700/8 blur-3xl" />
-      </div>
+  const router = useRouter();
+  const [profile, setProfile] = useState<Record<string, string> | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-      <div className="relative z-10 pt-14 px-5">
+  useEffect(() => {
+    setMounted(true);
+    const p = getUserProfile();
+    if (!p) router.replace('/onboarding');
+    else setProfile(p);
+  }, [router]);
+
+  if (!mounted || !profile) return null;
+
+  const birthYear = profile.birthDate ? parseInt(profile.birthDate.split('-')[0]) : 1995;
+  const currentAge = new Date().getFullYear() - birthYear;
+  const currentDaeWun = mockDaeWun.find(d => currentAge >= d.startAge && currentAge < d.endAge);
+
+  return (
+    <AppShell>
+      <div className="px-4 pt-14">
         <div className="mb-6">
-          <p className="text-xs tracking-[0.25em] text-violet-300/60 uppercase mb-1">대운·세운</p>
-          <h1 className="text-2xl font-bold text-white">인생의 흐름</h1>
-          <p className="text-sm text-white/40 mt-1">10년 단위 대운 타임라인</p>
+          <h1 className="text-xl font-bold text-white">10년 대운</h1>
+          <p className="text-xs text-white/40 mt-1">인생의 큰 흐름을 확인하세요</p>
         </div>
 
-        {/* Graph */}
-        <GlassCard className="p-5 mb-5">
-          <p className="text-xs text-white/40 mb-4">에너지 흐름 그래프</p>
-          <div className="relative h-24">
-            <svg viewBox="0 0 320 80" className="w-full h-full" preserveAspectRatio="none">
+        {currentDaeWun && (
+          <GlassCard glow className="p-5 mb-6 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-900/30 to-purple-900/20" />
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-[#C4B5FD]/20 text-[#C4B5FD] border border-[#C4B5FD]/20">현재 대운</span>
+                <span className="text-xs text-white/40">{currentDaeWun.startAge}~{currentDaeWun.endAge}세</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">{currentDaeWun.summary}</h3>
+              <div className="flex items-center gap-3 mt-3">
+                <div className="flex gap-2">
+                  <span className="text-sm font-bold px-3 py-1.5 rounded-xl"
+                    style={{ backgroundColor: `${elementColors[currentDaeWun.element]}20`, color: elementColors[currentDaeWun.element] }}>
+                    {currentDaeWun.heavenlyStem}
+                  </span>
+                  <span className="text-sm font-bold px-3 py-1.5 rounded-xl"
+                    style={{ backgroundColor: `${elementColors[currentDaeWun.element]}10`, color: `${elementColors[currentDaeWun.element]}CC` }}>
+                    {currentDaeWun.earthlyBranch}
+                  </span>
+                </div>
+                <span className="text-xs px-2 py-1 rounded-full"
+                  style={{ backgroundColor: `${energyLabels[currentDaeWun.energy].color}15`, color: energyLabels[currentDaeWun.energy].color }}>
+                  {energyLabels[currentDaeWun.energy].label}기
+                </span>
+              </div>
+            </div>
+          </GlassCard>
+        )}
+
+        <GlassCard className="p-5 mb-6">
+          <h3 className="text-sm font-medium text-white/60 mb-4">인생 흐름 그래프</h3>
+          <div className="relative h-20">
+            <svg viewBox="0 0 300 60" className="w-full h-full" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.8" />
-                  <stop offset="50%" stopColor="#C4B5FD" />
-                  <stop offset="100%" stopColor="#EC4899" stopOpacity="0.8" />
-                </linearGradient>
-                <linearGradient id="fillGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#93C5FD" />
+                  <stop offset="30%" stopColor="#6EE7B7" />
+                  <stop offset="50%" stopColor="#FCD34D" />
+                  <stop offset="70%" stopColor="#C4B5FD" />
+                  <stop offset="100%" stopColor="#F9A8D4" />
                 </linearGradient>
               </defs>
-
-              {(() => {
-                const points = DAEWUN.map((d, i) => {
-                  const x = (i / (DAEWUN.length - 1)) * 300 + 10;
-                  const y = 70 - ((d.score - 60) / (MAX_SCORE - 60)) * 60;
-                  return { x, y };
-                });
-
-                const pathD = points.reduce((acc, p, i) => {
-                  if (i === 0) return `M ${p.x} ${p.y}`;
-                  const prev = points[i - 1];
-                  const cpX = (prev.x + p.x) / 2;
-                  return `${acc} C ${cpX} ${prev.y} ${cpX} ${p.y} ${p.x} ${p.y}`;
-                }, "");
-
-                const fillD = `${pathD} L ${points[points.length - 1].x} 75 L ${points[0].x} 75 Z`;
-
-                return (
-                  <>
-                    <path d={fillD} fill="url(#fillGrad)" />
-                    <path d={pathD} fill="none" stroke="url(#lineGrad)" strokeWidth="2.5" strokeLinecap="round" />
-                    {points.map((p, i) => (
-                      <circle
-                        key={i}
-                        cx={p.x} cy={p.y} r={DAEWUN[i].isCurrent ? 5 : 3}
-                        fill={DAEWUN[i].isCurrent ? "#C4B5FD" : "rgba(255,255,255,0.4)"}
-                        stroke={DAEWUN[i].isCurrent ? "white" : "none"}
-                        strokeWidth="1.5"
-                      />
-                    ))}
-                  </>
-                );
-              })()}
+              <path
+                d="M0 50 C20 45, 40 30, 75 20 C100 12, 130 8, 150 5 C170 8, 200 15, 225 22 C250 28, 275 35, 300 40 L300 60 L0 60 Z"
+                fill="url(#lineGrad)"
+                fillOpacity="0.1"
+              />
+              <path
+                d="M0 50 C20 45, 40 30, 75 20 C100 12, 130 8, 150 5 C170 8, 200 15, 225 22 C250 28, 275 35, 300 40"
+                fill="none"
+                stroke="url(#lineGrad)"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <circle cx="150" cy="5" r="4" fill="#FCD34D" />
             </svg>
-
-            {/* Age labels */}
-            <div className="flex justify-between mt-1">
-              {DAEWUN.map((d) => (
-                <span key={d.startAge} className="text-[9px] text-white/30">{d.startAge}</span>
+            <div className="absolute bottom-0 left-0 right-0 flex justify-between">
+              {mockDaeWun.slice(0, 4).map((d) => (
+                <span key={d.startAge} className="text-xs text-white/30">{d.startAge}</span>
               ))}
             </div>
           </div>
         </GlassCard>
 
-        {/* Current highlight */}
-        {DAEWUN.filter((d) => d.isCurrent).map((d) => (
-          <GlassCard key={d.startAge} className="p-5 mb-5" glow>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full bg-violet-400 animate-orb-pulse" />
-              <span className="text-xs text-violet-300 font-medium">현재 대운</span>
-            </div>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex gap-2">
-                <span className="text-2xl font-bold text-violet-300">{d.gan}</span>
-                <span className="text-2xl font-bold text-violet-300/70">{d.ji}</span>
-              </div>
-              <div>
-                <p className="font-semibold text-white">{d.theme}</p>
-                <p className="text-xs text-white/50">{d.startAge}세 – {d.endAge}세</p>
-              </div>
-            </div>
-            <p className="text-sm text-white/65 leading-relaxed">{d.desc}</p>
-          </GlassCard>
-        ))}
-
-        {/* All periods */}
         <div className="space-y-3">
-          <p className="text-xs text-white/40 uppercase tracking-widest">전체 대운</p>
-          {DAEWUN.map((d, i) => (
-            <GlassCard key={i} className={`p-4 ${d.isCurrent ? "border-violet-400/30" : ""}`}>
-              <div className="flex items-center gap-4">
-                <div className="flex flex-col items-center w-10">
-                  <span className="text-lg font-bold text-white/70">{d.gan}</span>
-                  <span className="text-base font-bold text-white/40">{d.ji}</span>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="text-sm font-medium text-white">{d.theme}</p>
-                    <span className="text-xs text-white/40">{d.startAge}–{d.endAge}세</span>
+          {mockDaeWun.map((daeWun, i) => {
+            const isCurrent = currentAge >= daeWun.startAge && currentAge < daeWun.endAge;
+            const color = elementColors[daeWun.element] || '#C4B5FD';
+
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.06 }}
+              >
+                <GlassCard className={`p-4 ${isCurrent ? 'border-[#C4B5FD]/30' : ''}`}>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl flex flex-col items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: `${color}15`, border: `1px solid ${color}30` }}>
+                      <span className="text-xs font-bold" style={{ color }}>{daeWun.heavenlyStem}</span>
+                      <span className="text-xs" style={{ color: `${color}80` }}>{daeWun.earthlyBranch}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs text-white/40">{daeWun.startAge}~{daeWun.endAge}세</span>
+                        {isCurrent && (
+                          <span className="text-xs px-1.5 py-0.5 rounded-full bg-[#C4B5FD]/15 text-[#C4B5FD] border border-[#C4B5FD]/20">현재</span>
+                        )}
+                      </div>
+                      <p className="text-sm font-medium text-white truncate">{daeWun.summary}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <span className="text-lg font-bold" style={{ color }}>{daeWun.score}</span>
+                      <p className="text-xs text-white/30">{energyLabels[daeWun.energy].label}</p>
+                    </div>
                   </div>
-                  <div className="flex-1 h-1.5 rounded-full bg-white/8 overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${(d.score / MAX_SCORE) * 100}%`,
-                        background: d.isCurrent
-                          ? "linear-gradient(90deg, #7C3AED, #C4B5FD)"
-                          : "rgba(255,255,255,0.2)",
-                      }}
-                    />
-                  </div>
-                </div>
-                <span className="text-sm font-bold text-white/50 w-8 text-right">{d.score}</span>
-              </div>
-            </GlassCard>
-          ))}
+                </GlassCard>
+              </motion.div>
+            );
+          })}
         </div>
-
-        <button
-          className="mt-5 w-full py-4 rounded-3xl font-semibold text-white text-sm"
-          style={{
-            background: "linear-gradient(135deg, #7C3AED40, #EC489940)",
-            border: "1px solid rgba(196,181,253,0.25)",
-          }}
-        >
-          10년 흐름 자세히 보기
-        </button>
       </div>
-
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }

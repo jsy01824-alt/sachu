@@ -1,128 +1,125 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import BottomNav from "@/components/BottomNav";
-import GlassCard from "@/components/GlassCard";
-import CalendarView from "@/components/CalendarView";
-import { generateCalendarFortunes } from "@/data/mockData";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import AppShell from '@/components/AppShell';
+import GlassCard from '@/components/GlassCard';
+import CalendarView from '@/components/CalendarView';
+import { getUserProfile } from '@/lib/utils';
+import { generateCalendarFortunes } from '@/data/mockData';
 
-const CATEGORIES = ["전체", "면접", "계약", "연애", "이사", "휴식"];
+const categories = ['전체', '면접', '계약', '연애', '이사', '휴식'];
 
-const FORTUNE_MSGS: Record<string, { title: string; desc: string }> = {
-  great: { title: "최고의 날", desc: "에너지가 최고조에 달하는 날이에요. 중요한 결정이나 새로운 시작에 매우 좋습니다." },
-  good: { title: "좋은 날", desc: "전반적으로 좋은 흐름이 이어집니다. 계획한 일을 차분히 진행하면 좋은 결과가 있을 거예요." },
-  neutral: { title: "평온한 날", desc: "무리하지 않고 일상적인 흐름을 유지하세요. 쉬어가기 좋은 하루입니다." },
-  caution: { title: "신중한 날", desc: "오늘은 조금 신중한 하루입니다. 중요한 결정은 내일로 미루는 게 좋을 수 있어요." },
-};
-
-const COLORS: Record<string, string> = {
-  great: "#6EE7B7",
-  good: "#C4B5FD",
-  neutral: "rgba(255,255,255,0.3)",
-  caution: "#F9A8D4",
+const fortuneMessages: Record<string, string[]> = {
+  great: ['매우 좋은 날입니다. 중요한 결정을 내리기 좋아요', '모든 일이 순조롭게 풀리는 최상의 기운'],
+  good: ['전반적으로 좋은 에너지가 흐르는 날', '활발한 활동과 만남에 적합한 날'],
+  neutral: ['평범하지만 꾸준히 나아가기 좋은 날', '작은 것에 집중하며 기반을 다지는 날'],
+  caution: ['에너지가 약해 중요한 결정은 미루는 것이 좋아요', '휴식과 재충전에 집중하세요'],
 };
 
 export default function CalendarPage() {
-  const today = new Date().toISOString().split("T")[0];
-  const [selected, setSelected] = useState(today);
-  const [category, setCategory] = useState("전체");
-  const fortunes = generateCalendarFortunes();
+  const router = useRouter();
+  const [profile, setProfile] = useState<Record<string, string> | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const [fortunes] = useState(generateCalendarFortunes);
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [activeCategory, setActiveCategory] = useState('전체');
 
-  const selectedFortune = fortunes.find((f) => f.date === selected);
+  useEffect(() => {
+    setMounted(true);
+    const p = getUserProfile();
+    if (!p) router.replace('/onboarding');
+    else setProfile(p);
+  }, [router]);
+
+  if (!mounted || !profile) return null;
+
+  const selectedFortune = fortunes.find((f) => f.date === selectedDate);
 
   return (
-    <div className="relative min-h-screen bg-[#08090D] pb-28">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-10 right-0 w-64 h-64 rounded-full bg-teal-700/12 blur-3xl" />
-      </div>
-
-      <div className="relative z-10 pt-14 px-5">
+    <AppShell>
+      <div className="px-4 pt-14">
         <div className="mb-6">
-          <p className="text-xs tracking-[0.25em] text-mint-300/60 uppercase mb-1" style={{ color: "rgba(110,231,183,0.6)" }}>운세 캘린더</p>
-          <h1 className="text-2xl font-bold text-white">좋은 날 찾기</h1>
+          <h1 className="text-xl font-bold text-white">운세 달력</h1>
+          <p className="text-xs text-white/40 mt-1">날짜별 기운을 확인하세요</p>
         </div>
 
-        {/* Category */}
-        <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide">
-          {CATEGORIES.map((c) => (
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4 pb-1">
+          {categories.map((cat) => (
             <button
-              key={c}
-              onClick={() => setCategory(c)}
-              className={`flex-shrink-0 text-xs px-4 py-1.5 rounded-full border transition-all ${
-                category === c
-                  ? "bg-emerald-500/20 border-emerald-400/40 text-emerald-300"
-                  : "glass-card border-white/10 text-white/50"
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                activeCategory === cat
+                  ? 'bg-[#C4B5FD]/20 border border-[#C4B5FD]/30 text-[#C4B5FD]'
+                  : 'bg-white/5 border border-white/10 text-white/50'
               }`}
             >
-              {c}
+              {cat}
             </button>
           ))}
         </div>
 
-        {/* Legend */}
-        <div className="flex gap-4 mb-4">
-          {Object.entries(COLORS).map(([type, color]) => (
+        <GlassCard className="p-5 mb-4">
+          <CalendarView
+            fortunes={fortunes}
+            selectedDate={selectedDate}
+            onSelectDay={setSelectedDate}
+          />
+        </GlassCard>
+
+        <div className="flex gap-4 mb-4 justify-center">
+          {[
+            { type: 'great', label: '최고', color: 'bg-[#6EE7B7]' },
+            { type: 'good', label: '좋음', color: 'bg-[#C4B5FD]' },
+            { type: 'neutral', label: '보통', color: 'bg-white/30' },
+            { type: 'caution', label: '주의', color: 'bg-pink-300' },
+          ].map(({ type, label, color }) => (
             <div key={type} className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-              <span className="text-[10px] text-white/40">
-                {type === "great" ? "최고" : type === "good" ? "좋음" : type === "neutral" ? "평온" : "주의"}
-              </span>
+              <div className={`w-2 h-2 rounded-full ${color}`} />
+              <span className="text-xs text-white/40">{label}</span>
             </div>
           ))}
         </div>
 
-        {/* Calendar */}
-        <GlassCard className="p-5 mb-4">
-          <CalendarView
-            fortunes={fortunes}
-            onSelectDay={setSelected}
-            selectedDate={selected}
-          />
-        </GlassCard>
-
-        {/* Selected day detail */}
         {selectedFortune && (
-          <GlassCard className="p-5 animate-fade-in" glow>
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="text-xs text-white/40">
-                  {new Date(selected + "T00:00:00").toLocaleDateString("ko-KR", {
-                    month: "long",
-                    day: "numeric",
-                    weekday: "short",
-                  })}
-                </p>
-                <p className="font-semibold text-white mt-0.5">
-                  {FORTUNE_MSGS[selectedFortune.type].title}
-                </p>
-              </div>
-              <span
-                className="text-2xl font-bold"
-                style={{ color: COLORS[selectedFortune.type] }}
-              >
-                {selectedFortune.score}
-              </span>
-            </div>
-            <p className="text-sm text-white/65 leading-relaxed">
-              {FORTUNE_MSGS[selectedFortune.type].desc}
-            </p>
-            {selectedFortune.categories.length > 0 && (
-              <div className="flex gap-2 mt-3 flex-wrap">
-                {selectedFortune.categories.map((c) => (
-                  <span
-                    key={c}
-                    className="text-xs px-2.5 py-1 rounded-full bg-white/8 border border-white/10 text-white/60"
-                  >
-                    {c}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={selectedDate}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              <GlassCard className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold text-white">{selectedDate}</span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    selectedFortune.type === 'great' ? 'bg-[#6EE7B7]/15 text-[#6EE7B7]' :
+                    selectedFortune.type === 'good' ? 'bg-[#C4B5FD]/15 text-[#C4B5FD]' :
+                    selectedFortune.type === 'caution' ? 'bg-pink-300/15 text-pink-300' :
+                    'bg-white/10 text-white/50'
+                  }`}>
+                    {selectedFortune.type === 'great' ? '최고' : selectedFortune.type === 'good' ? '좋음' : selectedFortune.type === 'caution' ? '주의' : '보통'}
                   </span>
-                ))}
-              </div>
-            )}
-          </GlassCard>
+                </div>
+                <p className="text-sm text-white/70 leading-relaxed">
+                  {fortuneMessages[selectedFortune.type][0]}
+                </p>
+                {selectedFortune.categories.length > 0 && (
+                  <div className="mt-3 flex gap-2 flex-wrap">
+                    {selectedFortune.categories.map((cat) => (
+                      <span key={cat} className="text-xs px-2 py-1 rounded-full bg-white/5 border border-white/10 text-white/50">
+                        {cat}에 좋은 날
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </GlassCard>
+            </motion.div>
+          </AnimatePresence>
         )}
       </div>
-
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }

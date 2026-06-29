@@ -1,163 +1,153 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import BottomNav from "@/components/BottomNav";
-import GlassCard from "@/components/GlassCard";
-import { getUserProfile, clearUser } from "@/lib/utils";
-import { Flame, BookOpen, MessageSquare, RotateCcw } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { LogOut, Flame, BookOpen, TrendingUp } from 'lucide-react';
+import AppShell from '@/components/AppShell';
+import GlassCard from '@/components/GlassCard';
+import { getUserProfile, clearUserProfile } from '@/lib/utils';
 
-const DIARY_ENTRIES = [
-  { date: "6월 28일", mood: "좋음", note: "오늘 AI 상담에서 이직 관련 조언을 받았다. 생각보다 맞는 부분이 많았다.", tag: "이직" },
-  { date: "6월 25일", mood: "보통", note: "재물운이 좋지 않다고 해서 충동구매를 참았다. 오늘 좋은 선택이었다.", tag: "재물" },
-  { date: "6월 21일", mood: "최고", note: "대운이 상승하는 시기라고 하니 마음이 편해졌다.", tag: "대운" },
+const recentConsultations = [
+  { question: '이직할까요?', date: '3일 전', category: '직업' },
+  { question: '이 사람과 계속 만나도 될까요?', date: '1주 전', category: '연애' },
+  { question: '올해 해외에 나가도 될까요?', date: '2주 전', category: '기타' },
 ];
 
-const RECENT_CONSULTATIONS = [
-  { question: "이직할까요?", date: "오늘", category: "커리어" },
-  { question: "지금 투자해도 될까요?", date: "3일 전", category: "재물" },
-  { question: "이 사람과 계속 만나도 될까요?", date: "1주일 전", category: "연애" },
+const frequentCategories = [
+  { label: '직업·커리어', count: 8, color: '#6EE7B7' },
+  { label: '연애·관계', count: 6, color: '#F9A8D4' },
+  { label: '재물·투자', count: 4, color: '#FCD34D' },
+  { label: '건강', count: 2, color: '#93C5FD' },
 ];
 
-const CONCERN_CATEGORIES = [
-  { label: "커리어·이직", count: 12, color: "#C4B5FD" },
-  { label: "연애·관계", count: 8, color: "#F9A8D4" },
-  { label: "재물·투자", count: 6, color: "#FCD34D" },
-  { label: "건강", count: 3, color: "#6EE7B7" },
+const diaryEntries = [
+  { date: '오늘', content: '목(木) 기운이 강한 날. 새 아이디어가 떠올랐다.', mood: '✦' },
+  { date: '어제', content: '수(水) 에너지 주의 - 감정 기복이 있었지만 잘 넘겼다.', mood: '◐' },
+  { date: '3일 전', content: '화(火) 기운으로 활발했던 하루. 좋은 만남이 있었다.', mood: '◉' },
 ];
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ name: string; birthDate: string } | null>(null);
+  const [profile, setProfile] = useState<Record<string, string> | null>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const u = getUserProfile();
-    if (!u) { router.replace("/onboarding"); return; }
-    setUser(u);
+    setMounted(true);
+    const p = getUserProfile();
+    if (!p) router.replace('/onboarding');
+    else setProfile(p);
   }, [router]);
 
-  const handleReset = () => {
-    clearUser();
-    router.replace("/onboarding");
+  const handleLogout = () => {
+    clearUserProfile();
+    router.replace('/onboarding');
   };
 
-  if (!user) return null;
+  if (!mounted || !profile) return null;
 
   return (
-    <div className="relative min-h-screen bg-[#08090D] pb-28">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-10 right-0 w-64 h-64 rounded-full bg-violet-700/12 blur-3xl" />
-      </div>
-
-      <div className="relative z-10 pt-14 px-5">
-        <div className="mb-6">
-          <p className="text-xs tracking-[0.25em] text-violet-300/60 uppercase mb-1">기록</p>
-          <h1 className="text-2xl font-bold text-white">{user.name}님의 기록</h1>
+    <AppShell>
+      <div className="px-4 pt-14">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-3xl bg-gradient-to-br from-violet-500/40 to-purple-600/40 border border-violet-500/20 flex items-center justify-center text-xl font-bold text-[#C4B5FD]">
+              {profile.name[0]}
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-white">{profile.name}님</h1>
+              <p className="text-xs text-white/40">{profile.birthDate}</p>
+            </div>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="p-2 rounded-xl text-white/30 hover:text-white/60 hover:bg-white/5 transition-all"
+          >
+            <LogOut size={18} />
+          </button>
         </div>
 
-        {/* Streak */}
-        <GlassCard className="p-5 mb-5" glow>
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Flame size={18} className="text-orange-400" />
-              <p className="font-semibold text-white">체크인 스트릭</p>
-            </div>
-            <span className="text-2xl font-bold text-orange-400">7일</span>
+        <GlassCard className="p-5 mb-4" glow>
+          <div className="flex items-center gap-3 mb-3">
+            <Flame size={18} className="text-orange-400" />
+            <h3 className="text-sm font-semibold text-white">연속 체크인</h3>
           </div>
-          <div className="flex gap-1.5">
-            {Array.from({ length: 14 }).map((_, i) => (
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-bold text-orange-400">7</span>
+            <span className="text-sm text-white/40">일 연속</span>
+          </div>
+          <div className="flex gap-1.5 mt-3">
+            {Array.from({ length: 7 }).map((_, i) => (
               <div
                 key={i}
-                className="flex-1 h-2 rounded-full"
-                style={{
-                  background: i < 7 ? "#FB923C" : "rgba(255,255,255,0.08)",
-                  boxShadow: i < 7 ? "0 0 4px rgba(251,146,60,0.5)" : "none",
-                }}
+                className="flex-1 h-2 rounded-full bg-orange-400/60"
               />
             ))}
           </div>
-          <p className="text-xs text-white/40 mt-2">최근 14일 기록</p>
         </GlassCard>
 
-        {/* Concern categories */}
         <GlassCard className="p-5 mb-4">
-          <p className="text-xs text-white/40 mb-4">자주 묻는 고민</p>
-          <div className="space-y-3">
-            {CONCERN_CATEGORIES.map((c) => {
-              const max = Math.max(...CONCERN_CATEGORIES.map((x) => x.count));
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp size={16} className="text-[#C4B5FD]" />
+            <h3 className="text-sm font-semibold text-white">자주 물어보는 주제</h3>
+          </div>
+          <div className="space-y-2.5">
+            {frequentCategories.map((cat) => {
+              const maxCount = frequentCategories[0].count;
               return (
-                <div key={c.label} className="flex items-center gap-3">
-                  <span className="text-xs text-white/60 w-24 flex-shrink-0">{c.label}</span>
-                  <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
-                    <div
+                <div key={cat.label} className="flex items-center gap-3">
+                  <span className="text-xs text-white/50 w-20">{cat.label}</span>
+                  <div className="flex-1 bg-white/10 rounded-full h-1.5">
+                    <motion.div
                       className="h-full rounded-full"
-                      style={{
-                        width: `${(c.count / max) * 100}%`,
-                        background: c.color,
-                        boxShadow: `0 0 6px ${c.color}60`,
-                      }}
+                      style={{ backgroundColor: cat.color }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(cat.count / maxCount) * 100}%` }}
+                      transition={{ duration: 0.8 }}
                     />
                   </div>
-                  <span className="text-xs text-white/40 w-4 text-right">{c.count}</span>
+                  <span className="text-xs text-white/30 w-6 text-right">{cat.count}</span>
                 </div>
               );
             })}
           </div>
         </GlassCard>
 
-        {/* Recent consultations */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-3">
-            <MessageSquare size={14} className="text-white/40" />
-            <p className="text-xs text-white/40 uppercase tracking-widest">최근 상담</p>
+        <GlassCard className="p-5 mb-4">
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen size={16} className="text-[#6EE7B7]" />
+            <h3 className="text-sm font-semibold text-white">최근 상담 기록</h3>
           </div>
-          <div className="space-y-2">
-            {RECENT_CONSULTATIONS.map((c, i) => (
-              <GlassCard key={i} className="p-4 flex items-center justify-between" onClick={() => router.push("/chat")}>
-                <div>
-                  <p className="text-sm text-white">{c.question}</p>
-                  <p className="text-xs text-white/40 mt-0.5">{c.date}</p>
-                </div>
-                <span className="text-xs px-2.5 py-1 rounded-full bg-violet-500/15 border border-violet-400/20 text-violet-300">
+          <div className="space-y-3">
+            {recentConsultations.map((c, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <span className="text-xs px-2 py-1 rounded-full bg-white/5 border border-white/10 text-white/50 flex-shrink-0">
                   {c.category}
                 </span>
-              </GlassCard>
+                <p className="text-sm text-white/70 flex-1 truncate">{c.question}</p>
+                <span className="text-xs text-white/30 flex-shrink-0">{c.date}</span>
+              </div>
             ))}
           </div>
-        </div>
+        </GlassCard>
 
-        {/* Diary */}
-        <div className="mb-5">
-          <div className="flex items-center gap-2 mb-3">
-            <BookOpen size={14} className="text-white/40" />
-            <p className="text-xs text-white/40 uppercase tracking-widest">사주 일기</p>
-          </div>
-          <div className="space-y-2">
-            {DIARY_ENTRIES.map((e, i) => (
-              <GlassCard key={i} className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs text-white/40">{e.date}</p>
-                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-white/8 text-white/50 border border-white/10">
-                    #{e.tag}
-                  </span>
+        <GlassCard className="p-5 mb-4">
+          <h3 className="text-sm font-semibold text-white mb-4">사주 다이어리</h3>
+          <div className="space-y-3">
+            {diaryEntries.map((entry, i) => (
+              <div key={i} className="flex gap-3">
+                <div className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-sm flex-shrink-0">
+                  {entry.mood}
                 </div>
-                <p className="text-sm text-white/70 leading-relaxed">{e.note}</p>
-              </GlassCard>
+                <div>
+                  <p className="text-xs text-white/40 mb-1">{entry.date}</p>
+                  <p className="text-sm text-white/70 leading-relaxed">{entry.content}</p>
+                </div>
+              </div>
             ))}
           </div>
-        </div>
-
-        {/* Reset */}
-        <button
-          onClick={handleReset}
-          className="w-full py-3.5 rounded-2xl text-sm text-white/40 flex items-center justify-center gap-2 glass-card border border-white/8 hover:border-white/15 transition-all"
-        >
-          <RotateCcw size={14} />
-          사주 정보 초기화
-        </button>
+        </GlassCard>
       </div>
-
-      <BottomNav />
-    </div>
+    </AppShell>
   );
 }
