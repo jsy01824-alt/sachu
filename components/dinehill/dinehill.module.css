@@ -1,0 +1,787 @@
+/* DINEHILL — Homepage / Desktop 1280 (Figma 29:70) */
+
+.page {
+  --dinehill-bg-page: #ffffff;
+  --dinehill-bg-warm: #f3f1e7;
+  --dinehill-bg-footer: #111111;
+  --dinehill-text-primary: #171717;
+  --dinehill-text-secondary: #5e5e5a;
+  --dinehill-text-inverse: #ffffff;
+  --dinehill-icon-primary: #171717;
+  --dinehill-border-default: #171717;
+  --dinehill-overlay-dark: #000000;
+
+  --dh-scale: 1;
+  --dh-vh: 100vh;
+  --dh-duration: 900ms;
+  --dh-ease: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --font-en: 'Poppins', system-ui, sans-serif;
+  --font-kr: 'Noto Sans KR', system-ui, sans-serif;
+
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--dinehill-bg-page);
+  color: var(--dinehill-text-primary);
+  font-family: var(--font-kr);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+.track {
+  position: absolute;
+  inset: 0 0 auto 0;
+  will-change: transform;
+  transition: transform var(--dh-duration) var(--dh-ease);
+}
+
+.section {
+  position: relative;
+  width: 100%;
+  height: var(--dh-vh);
+  overflow: hidden;
+}
+
+/* 1280×720 design stage, scaled to fit the viewport */
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1280px;
+  height: 720px;
+  transform: translate(-50%, -50%) scale(var(--dh-scale));
+  transform-origin: center center;
+}
+
+/* ---------- Reveal animation (plays when a section becomes active) ---------- */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: 0s;
+}
+
+.isActive .reveal {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--dh-duration) * 0.45 + var(--d, 0s));
+}
+
+/* ---------- Shared pieces ---------- */
+
+.sectionTitle {
+  position: absolute;
+  left: 240px;
+  width: 800px;
+  height: 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  padding-top: 6.5px;
+}
+
+.divider {
+  width: 24px;
+  height: 1px;
+  background: var(--dinehill-icon-primary);
+}
+
+.titleText {
+  font-family: var(--font-en);
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 56px;
+  letter-spacing: -0.6px;
+  color: var(--dinehill-text-primary);
+  white-space: nowrap;
+}
+
+.navText {
+  font-family: var(--font-kr);
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.7px;
+}
+
+.moreLink {
+  position: absolute;
+  left: 590px;
+  top: 650px;
+  width: 100px;
+  height: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--dinehill-text-primary);
+  text-decoration: none;
+}
+
+.underline {
+  display: block;
+  width: 44px;
+  height: 2px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+
+.moreLink:hover .underline,
+.heroMore:hover .underline {
+  width: 64px;
+}
+
+/* ---------- Header ---------- */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  height: 96px;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--dinehill-text-inverse);
+  transition:
+    transform 0.6s var(--dh-ease),
+    opacity 0.6s ease;
+}
+
+.headerHidden {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.logo {
+  display: block;
+  width: 97.526px;
+  height: 33.506px;
+}
+
+.primaryNav {
+  margin-left: auto;
+  margin-right: 96px;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  white-space: nowrap;
+}
+
+.primaryNav a,
+.primaryNav button {
+  color: inherit;
+  text-decoration: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.primaryNav a:hover,
+.primaryNav button:hover {
+  opacity: 0.6;
+}
+
+.menuButton {
+  width: 30px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.menuButton img {
+  display: block;
+  width: 30px;
+  height: 20px;
+}
+
+/* ---------- Side dot navigation ---------- */
+
+.dots {
+  position: fixed;
+  right: 28px;
+  top: 50%;
+  z-index: 20;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: var(--dinehill-text-inverse);
+  transition:
+    color 0.4s ease,
+    opacity 0.4s ease;
+}
+
+.dotsDark {
+  color: var(--dinehill-text-primary);
+}
+
+.dotsHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease;
+}
+
+.dot:hover {
+  transform: scale(1.3);
+}
+
+.dotActive {
+  background: currentColor;
+}
+
+/* ---------- 01 / Hero ---------- */
+
+.hero {
+  background: #000;
+  color: var(--dinehill-text-inverse);
+}
+
+.heroBg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  transform: scale(1.08);
+  transition: transform 6s ease-out;
+}
+
+.isActive .heroBg {
+  transform: scale(1);
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: var(--dinehill-overlay-dark);
+  opacity: 0.18;
+}
+
+.heroContent {
+  position: absolute;
+  left: 64px;
+  top: 448px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.heroTitle {
+  font-family: var(--font-en);
+  font-weight: 600;
+  font-size: 80px;
+  line-height: 88px;
+  letter-spacing: -1.2px;
+  white-space: nowrap;
+}
+
+.heroSub {
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 30px;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+.heroMore {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.heroArrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 32px;
+  height: 48px;
+  margin-top: -24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.heroArrow:hover {
+  opacity: 0.6;
+}
+
+.heroArrow img {
+  display: block;
+  width: 32px;
+  height: 48px;
+}
+
+.heroPrev {
+  left: 40px;
+}
+
+.heroNext {
+  right: 40px;
+}
+
+.heroPagination {
+  position: absolute;
+  left: 1044px;
+  top: 604px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.progress {
+  position: relative;
+  width: 112px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+}
+
+.progress::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--dinehill-text-inverse);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+.isActive .progress::after {
+  animation: progressFill 6s linear forwards;
+}
+
+@keyframes progressFill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- 02 / Our Restaurants ---------- */
+
+.restaurants {
+  background: var(--dinehill-bg-page);
+}
+
+.restaurantRow {
+  position: absolute;
+  left: 84px;
+  top: 293px;
+  display: flex;
+  gap: 4px;
+}
+
+.restaurantCard {
+  position: relative;
+  display: block;
+  width: 544px;
+  height: 360px;
+  overflow: hidden;
+}
+
+.cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.cardMedia {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.restaurantCard:hover .cardMedia {
+  transform: scale(1.06);
+}
+
+.genPhoto {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 558px;
+  height: 558px;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.kanPhoto {
+  position: absolute;
+  left: -95px;
+  top: -302px;
+  width: 737px;
+  height: 1199px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  background: var(--dinehill-overlay-dark);
+  opacity: 0.42;
+  transition: opacity 0.4s ease;
+}
+
+.restaurantCard:hover .cardOverlay {
+  opacity: 0.55;
+}
+
+.genLogo {
+  position: absolute;
+  left: 236px;
+  top: 168px;
+}
+
+.kanLogo {
+  position: absolute;
+  left: 208px;
+  top: 159px;
+}
+
+/* ---------- 03 / Promotion ---------- */
+
+.promotion {
+  background: var(--dinehill-bg-warm);
+}
+
+.promoCard {
+  position: absolute;
+  top: 207px;
+  width: 260px;
+  height: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.promoImage {
+  position: relative;
+  width: 260px;
+  height: 194px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.promoImage img {
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.promoCard:hover .promoImage img {
+  transform: scale(1.06);
+}
+
+.promoImageFill {
+  display: block;
+  width: 260px;
+  height: 194px;
+}
+
+.promoImageShort {
+  height: 193px;
+}
+
+.promoImageCrop {
+  position: absolute;
+  left: 0;
+  top: -82.38%;
+  width: 100%;
+  height: 202.07%;
+  max-width: none;
+}
+
+.promoTitle {
+  width: 260px;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 30px;
+  letter-spacing: -0.3px;
+  color: var(--dinehill-text-primary);
+}
+
+.promoBody {
+  width: 260px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: -0.1px;
+  color: var(--dinehill-text-secondary);
+  word-break: break-all;
+}
+
+/* ---------- 04 / Gift Card ---------- */
+
+.gift {
+  background: var(--dinehill-bg-page);
+}
+
+.giftCopy {
+  position: absolute;
+  left: 84px;
+  top: 262px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 22px;
+}
+
+.giftHeading {
+  width: 590px;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 38px;
+  letter-spacing: -0.5px;
+}
+
+.giftBody {
+  width: 620px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: -0.1px;
+}
+
+.giftActions {
+  display: flex;
+  gap: 4px;
+}
+
+.outlineButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 232px;
+  height: 54px;
+  padding: 16px 24px;
+  border: 1px solid var(--dinehill-border-default);
+  background: var(--dinehill-bg-page);
+  color: var(--dinehill-text-primary);
+  font-family: var(--font-kr);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: -0.1px;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.outlineButton:hover {
+  background: var(--dinehill-text-primary);
+  color: var(--dinehill-text-inverse);
+}
+
+.giftCard {
+  position: absolute;
+  left: 766px;
+  width: 410px;
+  height: 139px;
+}
+
+/* ---------- 05 / Instagram ---------- */
+
+.instagram {
+  background: var(--dinehill-bg-page);
+}
+
+.instaHandle {
+  position: absolute;
+  left: 50%;
+  top: 208px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transform: translateX(-50%);
+  color: var(--dinehill-text-primary);
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: -0.1px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.isActive .instaHandle.reveal {
+  transform: translateX(-50%);
+}
+
+.instaHandle.reveal {
+  transform: translate(-50%, 40px);
+}
+
+.instaHandle img {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+
+.instaPosts {
+  position: absolute;
+  left: 22px;
+  top: 267px;
+  display: flex;
+  gap: 12px;
+}
+
+.instaPost {
+  position: relative;
+  display: block;
+  width: 238px;
+  height: 321px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.instaPost img {
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.instaPost:hover img {
+  transform: scale(1.05);
+}
+
+/* ---------- Footer ---------- */
+
+.footer {
+  position: relative;
+  width: 100%;
+  height: calc(370px * var(--dh-scale));
+  background: var(--dinehill-bg-footer);
+  color: var(--dinehill-text-inverse);
+  overflow: hidden;
+}
+
+.footerStage {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1280px;
+  height: 370px;
+  transform: translateX(-50%) scale(var(--dh-scale));
+  transform-origin: top center;
+  font-size: 13px;
+}
+
+.brandFamily {
+  position: absolute;
+  left: calc(50% - 256.5px);
+  top: 92px;
+  display: flex;
+  align-items: center;
+  gap: 42px;
+  transform: translateX(-50%);
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.brandFamily span {
+  opacity: 0.28;
+}
+
+.footerLogo {
+  position: absolute;
+  left: 81px;
+  top: 188px;
+}
+
+.companyInfo {
+  position: absolute;
+  left: 274px;
+  top: 184px;
+  width: 500px;
+  line-height: 24px;
+  opacity: 0.56;
+  white-space: pre-wrap;
+}
+
+.familySite {
+  position: absolute;
+  left: 816px;
+  top: 188px;
+  width: 251px;
+  line-height: 24px;
+  letter-spacing: -0.1px;
+  opacity: 0.72;
+  white-space: pre-wrap;
+}
+
+.familySite a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.familySite a:hover {
+  text-decoration: underline;
+}
+
+.copyright {
+  position: absolute;
+  left: 936px;
+  top: 328px;
+  line-height: 20px;
+  opacity: 0.48;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page {
+    --dh-duration: 1ms;
+  }
+
+  .reveal,
+  .heroBg,
+  .cardMedia,
+  .promoImage img,
+  .instaPost img {
+    transition: none;
+  }
+
+  .isActive .progress::after {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
