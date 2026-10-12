@@ -125,12 +125,12 @@
   [data-anim="fade"] { opacity: 0; }
   [data-anim="line"] { transform: scaleX(0); transition-duration: .8s; }
   [data-anim="img"] { clip-path: inset(100% 0 0 0); transition-duration: 1.2s; }
-  [data-anim="img"] > img { transform: scale(1.15); transition: transform 1.6s var(--ease-out); transition-delay: var(--d, 0s); }
+  [data-anim="img"] > img:first-child { transform: scale(1.15); transition: transform 1.6s var(--ease-out); transition-delay: var(--d, 0s); }
 
   .is-active [data-anim="up"], .is-active [data-anim="fade"] { opacity: 1; transform: none; }
   .is-active [data-anim="line"] { transform: none; }
   .is-active [data-anim="img"] { clip-path: inset(0 0 0 0); }
-  .is-active [data-anim="img"] > img { transform: none; }
+  .is-active [data-anim="img"] > img:first-child { transform: none; }
 
   /* ---------- Section title ---------- */
   .sec-title { display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; }
@@ -208,10 +208,10 @@
   .restaurants .sec-title { margin-bottom: clamp(24px, 4vh, 40px); }
   .rest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: min(1092px, 100% - var(--gutter) * 2); margin: 0 auto; }
   .rest-card { position: relative; display: block; aspect-ratio: 544 / 360; overflow: hidden; }
-  .rest-card > img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.6s var(--ease-out); }
-  .rest-card[data-brand="kan"] > img { object-position: 50% 62%; }
+  .rest-card__photo { width: 100%; height: 100%; object-fit: cover; transition: transform 1.6s var(--ease-out); }
+  .rest-card[data-brand="kan"] .rest-card__photo { object-position: 50% 62%; }
   .rest-card__overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, .42); transition: background-color .6s var(--ease-out); }
-  .rest-card__logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); transition: transform .6s var(--ease-out); }
+  .rest-card__logo { position: absolute; left: 50%; top: 50%; height: auto; transform: translate(-50%, -50%); transition: transform .6s var(--ease-out); }
   .rest-card[data-brand="gen"] .rest-card__logo { width: 13.14%; }
   .rest-card[data-brand="kan"] .rest-card__logo { width: 23.38%; }
   .rest-card__label {
@@ -224,7 +224,7 @@
     .rest-card:hover .rest-card__label { opacity: 1; transform: none; }
     .rest-card:hover .rest-card__overlay { background: rgba(0, 0, 0, .55); }
     .rest-card:hover .rest-card__logo { transform: translate(-50%, -60%); }
-    .rest-card.is-shown:hover > img { transform: scale(1.06); }
+    .rest-card.is-shown:hover .rest-card__photo { transform: scale(1.06); }
   }
 
   /* ---------- 03 Promotion ---------- */
@@ -432,13 +432,13 @@
     </div>
     <div class="rest-grid">
       <a class="rest-card" href="#" data-brand="gen" data-anim="img" style="--d:.25s" aria-label="GEN KOREAN BBQ">
-        <img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/66477.png" alt="">
+        <img class="rest-card__photo" src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/66477.png" alt="">
         <div class="rest-card__overlay"></div>
         <img class="rest-card__logo" src="https://www.figma.com/api/mcp/asset/d2076967-3c30-4a23-8ce3-efca275e41d5.svg" alt="">
         <span class="rest-card__label">GEN KOREAN BBQ</span>
       </a>
       <a class="rest-card" href="#" data-brand="kan" data-anim="img" style="--d:.4s" aria-label="KAN SUSHI">
-        <img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/025b0.png" alt="">
+        <img class="rest-card__photo" src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/025b0.png" alt="">
         <div class="rest-card__overlay"></div>
         <img class="rest-card__logo" src="https://www.figma.com/api/mcp/asset/2819123a-2865-4064-8408-81c06f1cf2c4.svg" alt="">
         <span class="rest-card__label">KAN SUSHI</span>
