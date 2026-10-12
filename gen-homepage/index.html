@@ -211,9 +211,11 @@
   .rest-card__photo { width: 100%; height: 100%; object-fit: cover; transition: transform 1.6s var(--ease-out); }
   .rest-card[data-brand="kan"] .rest-card__photo { object-position: 50% 62%; }
   .rest-card__overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, .42); transition: background-color .6s var(--ease-out); }
-  .rest-card__logo { position: absolute; left: 50%; top: 50%; height: auto; transform: translate(-50%, -50%); transition: transform .6s var(--ease-out); }
-  .rest-card[data-brand="gen"] .rest-card__logo { width: 13.14%; }
-  .rest-card[data-brand="kan"] .rest-card__logo { width: 23.38%; }
+  .rest-card__logo span { position: absolute; }
+  .rest-card__logo img { width: 100%; height: 100%; }
+  .rest-card__logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); transition: transform .6s var(--ease-out); }
+  .rest-card[data-brand="gen"] .rest-card__logo { width: 13.14%; height: 6.8%; }
+  .rest-card[data-brand="kan"] .rest-card__logo { width: 23.38%; height: 11.64%; }
   .rest-card__label {
     position: absolute; left: 0; right: 0; bottom: 28px; text-align: center;
     color: var(--text-inverse); font-size: 14px; font-weight: 500; letter-spacing: .7px;
@@ -434,13 +436,27 @@
       <a class="rest-card" href="#" data-brand="gen" data-anim="img" style="--d:.25s" aria-label="GEN KOREAN BBQ">
         <img class="rest-card__photo" src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/66477.png" alt="">
         <div class="rest-card__overlay"></div>
-        <img class="rest-card__logo" src="https://www.figma.com/api/mcp/asset/d2076967-3c30-4a23-8ce3-efca275e41d5.svg" alt="">
+        <div class="rest-card__logo" aria-hidden="true">
+          <span style="inset:-1.82% 0 0 -0.62%"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/d0232.svg" alt=""></span>
+        </div>
         <span class="rest-card__label">GEN KOREAN BBQ</span>
       </a>
       <a class="rest-card" href="#" data-brand="kan" data-anim="img" style="--d:.4s" aria-label="KAN SUSHI">
         <img class="rest-card__photo" src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/025b0.png" alt="">
         <div class="rest-card__overlay"></div>
-        <img class="rest-card__logo" src="https://www.figma.com/api/mcp/asset/2819123a-2865-4064-8408-81c06f1cf2c4.svg" alt="">
+        <div class="rest-card__logo" aria-hidden="true">
+          <span style="inset:43.99% 87.34% 22.25% 0"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/ce4e4.svg" alt=""></span>
+          <span style="inset:56.53% 79.47% 21.74% 13.43%"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/f7618.svg" alt=""></span>
+          <span style="inset:56.53% 70.70% 22.25% 21.13%"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/c372c.svg" alt=""></span>
+          <span style="inset:43.38% 27.97% 21.65% 64.63%"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/a2e84.svg" alt=""></span>
+          <span style="inset:57.30% 18.86% 21.39% 73.14%"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/bd631.svg" alt=""></span>
+          <span style="inset:56.53% 13.39% 21.39% 82.21%"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/0c54d.svg" alt=""></span>
+          <span style="inset:43.56% 4.23% 22.25% 87.51%"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/845a4.svg" alt=""></span>
+          <span style="inset:43.56% 0 22.25% 96.32%"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/540ea.svg" alt=""></span>
+          <span style="inset:0 37.77% 3.44% 30.33%"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/bc0f7.svg" alt=""></span>
+          <span style="inset:23.20% 42.17% 0 39.22%"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/a5de4.svg" alt=""></span>
+          <span style="inset:87.20% 0.60% 6.96% 64.84%"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/5c0f0.svg" alt=""></span>
+        </div>
         <span class="rest-card__label">KAN SUSHI</span>
       </a>
     </div>
@@ -526,7 +542,7 @@
   <footer class="section footer" id="footer" data-theme="dark">
     <div class="footer__inner">
       <div class="footer__brands"><span>GEN KOREAN BBQ</span><span>KAN SUSHI</span></div>
-      <div class="footer__logo"><img src="https://www.figma.com/api/mcp/asset/8b157bce-585b-4fa4-9e94-10bf4333b0d3.svg" alt="GEN"></div>
+      <div class="footer__logo"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/72174.svg" alt="GEN"></div>
       <div class="footer__info">
         <p>젠케이 유한회사 &nbsp;|&nbsp; 대표자 David Wook Jin Kim</p>
         <p>경기 성남시 수정구 위례서일로 46 1층 115호, 116호, 117호</p>
