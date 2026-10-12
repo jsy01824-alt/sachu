@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GEN Korean BBQ</title>
+<meta name="description" content="GEN KOREAN BBQ · KAN SUSHI">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-page: #fff;
+    --bg-warm: #f3f1e7;
+    --bg-footer: #111;
+    --text-primary: #171717;
+    --text-secondary: #5e5e5a;
+    --text-inverse: #fff;
+    --border-default: #171717;
+
+    --font-kr: "Noto Sans KR", system-ui, sans-serif;
+    --font-en: "Poppins", var(--font-kr);
+
+    --header-h: 96px;
+    --gutter: 84px;
+    --container: 1112px;
+
+    --ease-out: cubic-bezier(.22, .61, .36, 1);
+    --ease-page: cubic-bezier(.77, 0, .175, 1);
+    --page-duration: 1000ms;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-kr);
+    -webkit-font-smoothing: antialiased;
+    word-break: keep-all;
+  }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  p, h1, h2, h3 { margin: 0; }
+
+  .container { width: min(var(--container), 100% - var(--gutter) * 2); margin-inline: auto; }
+
+  /* ---------- Full-page mode ---------- */
+  html.fp, html.fp body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+  html.fp .fp-wrapper {
+    transition: transform var(--page-duration) var(--ease-page);
+    will-change: transform;
+  }
+  html.fp .fp-wrapper.no-transition { transition: none; }
+  html.fp .section { height: 100vh; }
+
+  .section { position: relative; overflow: hidden; }
+
+  /* ---------- Header ---------- */
+  .header {
+    position: fixed; inset: 0 0 auto; z-index: 50;
+    height: var(--header-h);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px;
+    color: var(--text-inverse);
+    transition: background-color .5s var(--ease-out), height .5s var(--ease-out), backdrop-filter .5s;
+  }
+  .header.is-solid { background: rgba(17, 17, 17, .88); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); --header-h: 76px; }
+  .header__logo img { width: 97.5px; height: 33.5px; }
+  .header__nav { display: flex; gap: 34px; margin-left: auto; margin-right: 48px; }
+  .nav-link {
+    position: relative;
+    font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: .7px;
+  }
+  .nav-link::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 1px;
+    background: currentColor; transform: scaleX(0); transform-origin: right;
+    transition: transform .4s var(--ease-out);
+  }
+  .nav-link:hover::after, .nav-link:focus-visible::after { transform: scaleX(1); transform-origin: left; }
+  .header__menu img { width: 30px; height: 20px; }
+
+  /* ---------- Menu overlay ---------- */
+  .menu {
+    position: fixed; inset: 0; z-index: 60;
+    background: var(--bg-footer); color: var(--text-inverse);
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 96px 40px 40px;
+    opacity: 0; visibility: hidden;
+    transition: opacity .5s var(--ease-out), visibility .5s;
+  }
+  .menu.is-open { opacity: 1; visibility: visible; }
+  .menu__close {
+    position: absolute; top: 28px; right: 36px; width: 40px; height: 40px;
+  }
+  .menu__close::before, .menu__close::after {
+    content: ""; position: absolute; left: 6px; right: 6px; top: 50%; height: 2px; background: currentColor;
+  }
+  .menu__close::before { transform: rotate(45deg); }
+  .menu__close::after { transform: rotate(-45deg); }
+  .menu__list { list-style: none; margin: 0 auto; padding: 0; width: min(1112px, 100%); }
+  .menu__list li { overflow: hidden; }
+  .menu__list a {
+    display: inline-block;
+    font-family: var(--font-en); font-size: clamp(36px, 6vw, 64px); line-height: 1.35; letter-spacing: -.6px;
+    transform: translateY(100%); transition: transform .8s var(--ease-out), opacity .3s;
+  }
+  .menu.is-open .menu__list a { transform: none; }
+  .menu__list a:hover { opacity: .5; }
+  .menu__list li:nth-child(2) a { transition-delay: .05s; }
+  .menu__list li:nth-child(3) a { transition-delay: .1s; }
+  .menu__list li:nth-child(4) a { transition-delay: .15s; }
+  .menu__list li:nth-child(5) a { transition-delay: .2s; }
+  .menu__list li:nth-child(6) a { transition-delay: .25s; }
+
+  /* ---------- Entrance animations ---------- */
+  [data-anim] {
+    transition-property: opacity, transform, clip-path;
+    transition-duration: 1s;
+    transition-timing-function: var(--ease-out);
+    transition-delay: var(--d, 0s);
+  }
+  [data-anim="up"] { opacity: 0; transform: translateY(48px); }
+  [data-anim="fade"] { opacity: 0; }
+  [data-anim="line"] { transform: scaleX(0); transition-duration: .8s; }
+  [data-anim="img"] { clip-path: inset(100% 0 0 0); transition-duration: 1.2s; }
+  [data-anim="img"] > img { transform: scale(1.15); transition: transform 1.6s var(--ease-out); transition-delay: var(--d, 0s); }
+
+  .is-active [data-anim="up"], .is-active [data-anim="fade"] { opacity: 1; transform: none; }
+  .is-active [data-anim="line"] { transform: none; }
+  .is-active [data-anim="img"] { clip-path: inset(0 0 0 0); }
+  .is-active [data-anim="img"] > img { transform: none; }
+
+  /* ---------- Section title ---------- */
+  .sec-title { display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center; }
+  .sec-title__line { width: 24px; height: 1px; background: var(--text-primary); }
+  .sec-title h2 {
+    font-family: var(--font-en); font-weight: 400;
+    font-size: clamp(32px, 4.2vw, 48px); line-height: 1.1667; letter-spacing: -.6px;
+  }
+
+  .more {
+    display: inline-flex; flex-direction: column; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: .7px;
+  }
+  .more::after {
+    content: ""; width: 44px; height: 2px; background: currentColor;
+    transition: width .4s var(--ease-out);
+  }
+  .more:hover::after { width: 100%; }
+
+  /* ---------- 01 Hero ---------- */
+  .hero { background: #000; color: var(--text-inverse); }
+  .hero__slide {
+    position: absolute; inset: 0;
+    opacity: 0; visibility: hidden;
+    transition: opacity 1.2s var(--ease-out), visibility 1.2s;
+  }
+  .hero__slide.is-current { opacity: 1; visibility: visible; z-index: 1; }
+  .hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); transition: transform 7s linear; }
+  .hero__slide.is-current .hero__img { transform: scale(1); }
+  .hero__overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, .18); }
+  .hero__slide[data-dim] .hero__overlay { background: rgba(0, 0, 0, .37); }
+  .hero__content {
+    position: absolute; left: 64px; bottom: 104px; right: 64px;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  }
+  .hero__title {
+    font-family: var(--font-en); font-weight: 600;
+    font-size: clamp(40px, 6.25vw, 80px); line-height: 1.1; letter-spacing: -1.2px;
+  }
+  .hero__sub { font-size: 18px; line-height: 30px; letter-spacing: -.2px; }
+  .hero__content [data-anim] { transition-delay: calc(var(--d, 0s) + .3s); }
+  .hero__slide:not(.is-current) [data-anim="up"] { opacity: 0; transform: translateY(48px); transition-duration: .3s; transition-delay: 0s; }
+
+  .hero__arrow {
+    position: absolute; top: 50%; z-index: 2; width: 32px; height: 48px; margin-top: -24px;
+    transition: opacity .3s, transform .4s var(--ease-out);
+  }
+  .hero__arrow img { width: 32px; height: 48px; }
+  .hero__arrow--prev { left: 40px; }
+  .hero__arrow--next { right: 40px; }
+  .hero__arrow--prev:hover { transform: translateX(-6px); }
+  .hero__arrow--next:hover { transform: translateX(6px); }
+
+  .hero__pager {
+    position: absolute; right: 88px; bottom: 96px; z-index: 2;
+    display: flex; align-items: center; gap: 16px;
+    font-size: 13px; line-height: 20px;
+  }
+  .hero__bar { position: relative; width: 112px; height: 2px; background: rgba(255, 255, 255, .3); overflow: hidden; }
+  .hero__bar span { position: absolute; inset: 0; background: var(--text-inverse); transform: scaleX(0); transform-origin: left; }
+  .hero__bar span.is-running { transform: scaleX(1); transition: transform var(--autoplay, 6s) linear; }
+
+  .scroll-cue {
+    position: absolute; left: 50%; bottom: 28px; z-index: 2;
+    width: 1px; height: 48px; background: rgba(255, 255, 255, .3); overflow: hidden;
+  }
+  .scroll-cue::after {
+    content: ""; position: absolute; left: 0; top: 0; width: 1px; height: 100%; background: #fff;
+    animation: cue 2s var(--ease-out) infinite;
+  }
+  @keyframes cue { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+
+  /* ---------- 02 Our Restaurants ---------- */
+  .restaurants { display: flex; flex-direction: column; justify-content: center; padding: 96px 0 48px; }
+  .restaurants .sec-title { margin-bottom: clamp(24px, 4vh, 40px); }
+  .rest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: min(1092px, 100% - var(--gutter) * 2); margin: 0 auto; }
+  .rest-card { position: relative; display: block; aspect-ratio: 544 / 360; overflow: hidden; }
+  .rest-card > img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.6s var(--ease-out); }
+  .rest-card[data-brand="kan"] > img { object-position: 50% 62%; }
+  .rest-card__overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, .42); transition: background-color .6s var(--ease-out); }
+  .rest-card__logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); transition: transform .6s var(--ease-out); }
+  .rest-card[data-brand="gen"] .rest-card__logo { width: 13.14%; }
+  .rest-card[data-brand="kan"] .rest-card__logo { width: 23.38%; }
+  .rest-card__label {
+    position: absolute; left: 0; right: 0; bottom: 28px; text-align: center;
+    color: var(--text-inverse); font-size: 14px; font-weight: 500; letter-spacing: .7px;
+    opacity: 0; transform: translateY(10px); transition: opacity .5s var(--ease-out), transform .5s var(--ease-out);
+  }
+  .rest-card:focus-visible .rest-card__label { opacity: 1; transform: none; }
+  @media (hover: hover) {
+    .rest-card:hover .rest-card__label { opacity: 1; transform: none; }
+    .rest-card:hover .rest-card__overlay { background: rgba(0, 0, 0, .55); }
+    .rest-card:hover .rest-card__logo { transform: translate(-50%, -60%); }
+    .rest-card.is-shown:hover > img { transform: scale(1.06); }
+  }
+
+  /* ---------- 03 Promotion ---------- */
+  .promotion { background: var(--bg-warm); display: flex; flex-direction: column; justify-content: center; padding: 96px 0 32px; }
+  .promotion .sec-title { margin-bottom: clamp(24px, 5vh, 48px); }
+  .promo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .promo-card { display: flex; flex-direction: column; gap: 16px; }
+  .promo-card__img { aspect-ratio: 260 / 194; overflow: hidden; }
+  .promo-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease-out); }
+  .promo-card:nth-child(3) .promo-card__img img { object-position: 50% 81%; }
+  .promo-card:hover .promo-card__img img { transform: scale(1.06); }
+  .promo-card h3 { font-size: 22px; font-weight: 700; line-height: 30px; letter-spacing: -.3px; }
+  .promo-card p { font-size: 16px; line-height: 26px; letter-spacing: -.1px; color: var(--text-secondary); }
+  .promotion .more, .gift .more { align-self: center; margin-top: clamp(20px, 4vh, 40px); }
+
+  /* ---------- 04 Gift Card ---------- */
+  .gift { display: flex; flex-direction: column; justify-content: center; padding: 96px 0 32px; }
+  .gift .sec-title { margin-bottom: clamp(32px, 9vh, 88px); }
+  .gift__body { display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+  .gift__copy { display: flex; flex-direction: column; gap: 22px; max-width: 620px; }
+  .gift__copy h3 { font-size: 28px; font-weight: 700; line-height: 38px; letter-spacing: -.5px; }
+  .gift__copy p { font-size: 16px; line-height: 26px; letter-spacing: -.1px; }
+  .gift__actions { display: flex; gap: 4px; }
+  .btn-outline {
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: 232px; height: 54px; padding: 16px 24px;
+    border: 1px solid var(--border-default); background: var(--bg-page); overflow: hidden;
+    font-size: 16px; font-weight: 500; line-height: 22px; letter-spacing: -.1px;
+    transition: color .4s var(--ease-out);
+  }
+  .btn-outline::before {
+    content: ""; position: absolute; inset: 0; background: var(--text-primary);
+    transform: scaleY(0); transform-origin: bottom; transition: transform .4s var(--ease-out);
+  }
+  .btn-outline span { position: relative; }
+  @media (hover: hover) {
+    .btn-outline:hover { color: var(--text-inverse); }
+    .btn-outline:hover::before { transform: scaleY(1); }
+  }
+  .gift__cards { flex: 0 0 auto; width: 410px; }
+  .gift__cards img { width: 100%; aspect-ratio: 410 / 139; object-fit: cover; }
+
+  /* ---------- 05 Instagram ---------- */
+  .instagram { display: flex; flex-direction: column; justify-content: center; padding: 96px 0 40px; }
+  .insta-handle {
+    display: inline-flex; align-items: center; gap: 8px; align-self: center;
+    margin: 50px 0 33px; font-size: 16px; line-height: 26px; letter-spacing: -.1px;
+  }
+  .insta-handle img { width: 22px; height: 22px; }
+  .insta-handle:hover span { text-decoration: underline; text-underline-offset: 3px; }
+  .insta-marquee { overflow: hidden; }
+  .insta-track { display: flex; gap: 12px; width: max-content; animation: marquee 48s linear infinite; }
+  .insta-marquee:hover .insta-track { animation-play-state: paused; }
+  .insta-post { flex: 0 0 auto; width: 238px; aspect-ratio: 238 / 321; overflow: hidden; }
+  .insta-post img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--ease-out), opacity .4s; }
+  .insta-post:hover img { transform: scale(1.05); opacity: .85; }
+  @keyframes marquee { to { transform: translateX(calc(-50% - 6px)); } }
+
+  /* ---------- Footer ---------- */
+  .footer { background: var(--bg-footer); color: var(--text-inverse); font-size: 13px; }
+  html.fp .footer.section { height: auto; }
+  .footer__inner {
+    position: relative; width: min(1118px, 100% - 80px); margin: 0 auto;
+    display: grid; grid-template-columns: 193px 542px 1fr; grid-template-rows: auto auto auto;
+    padding: 92px 0 22px; min-height: 370px;
+  }
+  .footer__brands { grid-column: 2 / 4; display: flex; gap: 42px; line-height: 20px; opacity: .28; margin-bottom: 72px; }
+  .footer__logo { grid-column: 1; padding-top: 4px; }
+  .footer__logo img { width: 97.5px; height: auto; }
+  .footer__info { grid-column: 2; line-height: 24px; opacity: .56; }
+  .footer__family { grid-column: 3; line-height: 24px; letter-spacing: -.1px; opacity: .72; padding-top: 4px; }
+  .footer__family a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .footer__copy { grid-column: 3; align-self: end; margin-top: 64px; padding-left: 120px; line-height: 20px; opacity: .48; }
+
+  /* ---------- Tablet / mobile (normal scroll) ---------- */
+  @media (max-width: 1024px) {
+    :root { --gutter: 32px; }
+    .header__nav { display: none; }
+    .promo-grid { grid-template-columns: repeat(2, 1fr); row-gap: 40px; }
+    .gift__body { flex-direction: column; align-items: flex-start; }
+    .gift__cards { width: min(410px, 100%); }
+    .section:not(.hero):not(.footer) { padding: 96px 0; }
+    .footer__inner { grid-template-columns: 160px 1fr; }
+    .footer__brands { grid-column: 1 / 3; }
+    .footer__family { grid-column: 2; margin-top: 24px; }
+    .footer__copy { grid-column: 1 / 3; padding-left: 0; margin-top: 40px; }
+  }
+  @media (max-width: 1024px), (max-height: 600px) {
+    .hero { height: 100vh; height: 100svh; min-height: 560px; }
+  }
+  @media (max-width: 640px) {
+    :root { --header-h: 64px; --gutter: 20px; }
+    .header { padding: 0 20px; }
+    .header.is-solid { --header-h: 60px; }
+    .header__logo img { width: 78px; height: auto; }
+    .header__menu img { width: 26px; height: auto; }
+    .hero__content { left: 20px; right: 20px; bottom: 120px; }
+    .hero__sub { font-size: 16px; line-height: 26px; }
+    .hero__arrow { display: none; }
+    .hero__pager { left: 20px; right: auto; bottom: 64px; }
+    .scroll-cue { display: none; }
+    .section:not(.hero):not(.footer) { padding: 72px 0; }
+    .rest-grid { grid-template-columns: 1fr; }
+    .rest-card__label { opacity: 1; transform: none; bottom: 18px; }
+    .promo-grid {
+      display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory;
+      width: auto; margin: 0; padding: 0 var(--gutter) 8px; scrollbar-width: none;
+    }
+    .promo-grid::-webkit-scrollbar { display: none; }
+    .promo-card { flex: 0 0 78%; scroll-snap-align: center; }
+    .promo-card h3 { font-size: 20px; line-height: 28px; }
+    .promo-card p { font-size: 15px; line-height: 24px; }
+    .gift__copy h3 { font-size: 22px; line-height: 30px; }
+    .gift__copy p { font-size: 15px; line-height: 24px; }
+    .gift__copy p br { display: none; }
+    .gift__actions { flex-direction: column; width: 100%; }
+    .btn-outline { width: 100%; }
+    .insta-handle { margin: 32px 0 24px; }
+    .insta-post { width: 160px; }
+    .footer__inner { grid-template-columns: 1fr; padding: 56px 0 32px; width: calc(100% - 40px); }
+    .footer__brands { grid-column: 1; margin-bottom: 32px; gap: 24px; }
+    .footer__logo { margin-bottom: 20px; }
+    .footer__info, .footer__family, .footer__copy { grid-column: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; transition-delay: 0s !important; }
+    .insta-track { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header" id="header">
+  <a class="header__logo" href="#hero" data-goto="0" aria-label="GEN 홈">
+    <img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/72174.svg" alt="GEN Korean BBQ House">
+  </a>
+  <nav class="header__nav" aria-label="주요 메뉴">
+    <a class="nav-link" href="#restaurants" data-goto="1">ABOUT</a>
+    <a class="nav-link" href="#promotion" data-goto="2">MENU</a>
+    <a class="nav-link" href="#restaurants" data-goto="1">LOCATIONS</a>
+    <a class="nav-link" href="#footer" data-goto="5">FAQ</a>
+    <a class="nav-link" href="#promotion" data-goto="2">PROMOTION</a>
+    <a class="nav-link" href="#gift" data-goto="3">GIFT</a>
+  </nav>
+  <button class="header__menu" id="menuOpen" aria-label="전체 메뉴 열기" aria-expanded="false" aria-controls="menu">
+    <img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/af33b.svg" alt="">
+  </button>
+</header>
+
+<div class="menu" id="menu" aria-hidden="true">
+  <button class="menu__close" id="menuClose" aria-label="메뉴 닫기"></button>
+  <ul class="menu__list">
+    <li><a href="#restaurants" data-goto="1">About</a></li>
+    <li><a href="#promotion" data-goto="2">Menu</a></li>
+    <li><a href="#restaurants" data-goto="1">Locations</a></li>
+    <li><a href="#footer" data-goto="5">FAQ</a></li>
+    <li><a href="#promotion" data-goto="2">Promotion</a></li>
+    <li><a href="#gift" data-goto="3">Gift</a></li>
+  </ul>
+</div>
+
+<main class="fp-wrapper" id="fp">
+
+  <!-- 01 / Hero -->
+  <section class="section hero" id="hero" data-theme="dark" aria-roledescription="carousel" aria-label="메인 비주얼">
+    <div class="hero__slide is-current">
+      <img class="hero__img" src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/32a88.png" alt="GEN 매장 입구">
+      <div class="hero__overlay"></div>
+      <div class="hero__content">
+        <h1 class="hero__title" data-anim="up">GEN KOREAN BBQ</h1>
+        <p class="hero__sub" data-anim="up" style="--d:.12s">젠코리안바베큐</p>
+        <a class="more" href="#restaurants" data-goto="1" data-anim="up" style="--d:.24s">MORE</a>
+      </div>
+    </div>
+    <div class="hero__slide" data-dim>
+      <img class="hero__img" src="https://www.figma.com/api/mcp/asset/c2923274-cde8-4c50-9d57-bfbd5982ce86/5e86b.png" alt="GEN 대표 메뉴 한 상">
+      <div class="hero__overlay"></div>
+      <div class="hero__content">
+        <p class="hero__title" data-anim="up">GEN KOREAN BBQ</p>
+        <p class="hero__sub" data-anim="up" style="--d:.12s">젠코리안바베큐</p>
+        <a class="more" href="#restaurants" data-goto="1" data-anim="up" style="--d:.24s">MORE</a>
+      </div>
+    </div>
+
+    <button class="hero__arrow hero__arrow--prev" id="heroPrev" aria-label="이전 슬라이드">
+      <img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/fc8c0.svg" alt="">
+    </button>
+    <button class="hero__arrow hero__arrow--next" id="heroNext" aria-label="다음 슬라이드">
+      <img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/1bd22.svg" alt="">
+    </button>
+    <div class="hero__pager" aria-live="polite">
+      <span id="heroCurrent">1</span>
+      <div class="hero__bar"><span id="heroBar"></span></div>
+      <span id="heroTotal">2</span>
+    </div>
+    <span class="scroll-cue" aria-hidden="true"></span>
+  </section>
+
+  <!-- 02 / Our Restaurants -->
+  <section class="section restaurants" id="restaurants" data-theme="light">
+    <div class="sec-title">
+      <span class="sec-title__line" data-anim="line"></span>
+      <h2 data-anim="up" style="--d:.1s">Our Restaurants</h2>
+    </div>
+    <div class="rest-grid">
+      <a class="rest-card" href="#" data-brand="gen" data-anim="img" style="--d:.25s" aria-label="GEN KOREAN BBQ">
+        <img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/66477.png" alt="">
+        <div class="rest-card__overlay"></div>
+        <img class="rest-card__logo" src="https://www.figma.com/api/mcp/asset/d2076967-3c30-4a23-8ce3-efca275e41d5.svg" alt="">
+        <span class="rest-card__label">GEN KOREAN BBQ</span>
+      </a>
+      <a class="rest-card" href="#" data-brand="kan" data-anim="img" style="--d:.4s" aria-label="KAN SUSHI">
+        <img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/025b0.png" alt="">
+        <div class="rest-card__overlay"></div>
+        <img class="rest-card__logo" src="https://www.figma.com/api/mcp/asset/2819123a-2865-4064-8408-81c06f1cf2c4.svg" alt="">
+        <span class="rest-card__label">KAN SUSHI</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 03 / Promotion -->
+  <section class="section promotion" id="promotion" data-theme="light">
+    <div class="sec-title">
+      <span class="sec-title__line" data-anim="line"></span>
+      <h2 data-anim="up" style="--d:.1s">Promotion</h2>
+    </div>
+    <div class="promo-grid container">
+      <article class="promo-card">
+        <div class="promo-card__img" data-anim="img" style="--d:.2s"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/bc0b6.png" alt="GEN 점심 메뉴"></div>
+        <h3 data-anim="up" style="--d:.35s">GEN 점심 개시</h3>
+        <p data-anim="up" style="--d:.45s">곱창전골부터 황태해장국, 김치찌개까지. 점심에 가장 생각나는 뜨끈하고 든든한 메뉴들이 GEN에 새롭게 찾아왔습니다.</p>
+      </article>
+      <article class="promo-card">
+        <div class="promo-card__img" data-anim="img" style="--d:.3s"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/ca188.png" alt="초밥과 돈까스 세트"></div>
+        <h3 data-anim="up" style="--d:.45s">직장인을 위한 갓성비 세트</h3>
+        <p data-anim="up" style="--d:.55s">초밥과 후토마끼, 미니우동은 물론 돈까스까지 한 상에. GEN이 준비한 새로운 점심을 만나보세요.</p>
+      </article>
+      <article class="promo-card">
+        <div class="promo-card__img" data-anim="img" style="--d:.4s"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/d6590.png" alt="아부리 초밥 세트"></div>
+        <h3 data-anim="up" style="--d:.55s">불향을 입은 아부리</h3>
+        <p data-anim="up" style="--d:.65s">불향을 입힌 아부리초밥에 후토마끼와 미니우동을 더했습니다. 익숙한 스시와는 다른 점심 한 상을 만나보세요.</p>
+      </article>
+      <article class="promo-card">
+        <div class="promo-card__img" data-anim="img" style="--d:.5s"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/9cc0b.png" alt="한강라면과 초밥"></div>
+        <h3 data-anim="up" style="--d:.65s">한강라면의 뜻밖의 짝</h3>
+        <p data-anim="up" style="--d:.75s">한강라면에 칸스시 또는 아부리를 곁들이면 어떤 맛일까요? 의외로 잘 어울리는 두 가지 점심 조합을 만나보세요.</p>
+      </article>
+    </div>
+    <a class="more" href="#" data-anim="fade" style="--d:.8s">MORE</a>
+  </section>
+
+  <!-- 04 / Gift Card -->
+  <section class="section gift" id="gift" data-theme="light">
+    <div class="sec-title">
+      <span class="sec-title__line" data-anim="line"></span>
+      <h2 data-anim="up" style="--d:.1s">Gift Card</h2>
+    </div>
+    <div class="gift__body container">
+      <div class="gift__copy">
+        <h3 data-anim="up" style="--d:.25s">특별한 날, GEN을 선물하세요!</h3>
+        <p data-anim="up" style="--d:.35s">푸짐한 한 상과 함께하는 즐거운 시간을 GEN 기프트카드에 담았습니다. <br>생일과 기념일, 고마운 마음을 전하고 싶은 순간에 특별한 한 끼를 선물해보세요.</p>
+        <div class="gift__actions" data-anim="up" style="--d:.45s">
+          <a class="btn-outline" href="#"><span>모바일 카드 구매하기</span></a>
+          <a class="btn-outline" href="#"><span>기프트카드 구매하기</span></a>
+        </div>
+      </div>
+      <div class="gift__cards">
+        <div data-anim="img" style="--d:.35s"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/e0880.png" alt="GEN 기프트카드 PREMIER, GOLD"></div>
+        <div data-anim="img" style="--d:.5s"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/5a70e.png" alt="GEN 기프트카드 PLATINUM, BLACK"></div>
+      </div>
+    </div>
+    <a class="more" href="#" data-anim="fade" style="--d:.7s">MORE</a>
+  </section>
+
+  <!-- 05 / Instagram -->
+  <section class="section instagram" id="instagram" data-theme="light">
+    <div class="sec-title">
+      <span class="sec-title__line" data-anim="line"></span>
+      <h2 data-anim="up" style="--d:.1s">Instagram</h2>
+    </div>
+    <a class="insta-handle" href="https://www.instagram.com/genkoreanbbq_korea/" target="_blank" rel="noopener" data-anim="up" style="--d:.2s">
+      <img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/66e6c.svg" alt="">
+      <span>genkoreanbbq_korea</span>
+    </a>
+    <div class="insta-marquee" data-anim="up" style="--d:.3s">
+      <div class="insta-track" id="instaTrack">
+        <a class="insta-post" href="https://www.instagram.com/genkoreanbbq_korea/" target="_blank" rel="noopener"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/b6366.png" alt="인스타그램 게시물 1"></a>
+        <a class="insta-post" href="https://www.instagram.com/genkoreanbbq_korea/" target="_blank" rel="noopener"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/75e26.png" alt="인스타그램 게시물 2"></a>
+        <a class="insta-post" href="https://www.instagram.com/genkoreanbbq_korea/" target="_blank" rel="noopener"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/e5dfd.png" alt="인스타그램 게시물 3"></a>
+        <a class="insta-post" href="https://www.instagram.com/genkoreanbbq_korea/" target="_blank" rel="noopener"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/2dd1e.png" alt="인스타그램 게시물 4"></a>
+        <a class="insta-post" href="https://www.instagram.com/genkoreanbbq_korea/" target="_blank" rel="noopener"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/10108.png" alt="인스타그램 게시물 5"></a>
+        <a class="insta-post" href="https://www.instagram.com/genkoreanbbq_korea/" target="_blank" rel="noopener"><img src="https://www.figma.com/api/mcp/asset/92031bd2-308c-440f-877f-c234a4bd466d/8ede5.png" alt="인스타그램 게시물 6"></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="section footer" id="footer" data-theme="dark">
+    <div class="footer__inner">
+      <div class="footer__brands"><span>GEN KOREAN BBQ</span><span>KAN SUSHI</span></div>
+      <div class="footer__logo"><img src="https://www.figma.com/api/mcp/asset/8b157bce-585b-4fa4-9e94-10bf4333b0d3.svg" alt="GEN"></div>
+      <div class="footer__info">
+        <p>젠케이 유한회사 &nbsp;|&nbsp; 대표자 David Wook Jin Kim</p>
+        <p>경기 성남시 수정구 위례서일로 46 1층 115호, 116호, 117호</p>
+        <p>젠코리안바베큐 위례점 &nbsp;|&nbsp; Tel <a href="tel:050714203057">0507-1420-3057</a></p>
+      </div>
+      <div class="footer__family">
+        <p>FAMILY SITE</p>
+        <p><a href="#">GEN KOREAN BBQ</a> &nbsp;&nbsp;|&nbsp;&nbsp; <a href="#">KAN SUSHI</a></p>
+      </div>
+      <p class="footer__copy">Copyright © GEN. All rights reserved.</p>
+    </div>
+  </footer>
+</main>
+
+<script>
+(() => {
+  const root = document.documentElement;
+  const wrapper = document.getElementById('fp');
+  const sections = [...wrapper.querySelectorAll('.section')];
+  const header = document.getElementById('header');
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Full-page mode only where every section fits one screen; smaller screens fall back to normal scroll.
+  const fpQuery = matchMedia('(min-width: 1025px) and (min-height: 601px)');
+
+  let index = 0;
+  let locked = false;
+  let fpEnabled = false;
+
+  /* ---------- Section activation (entrance animations) ---------- */
+  function activate(i) {
+    sections.forEach((s, n) => s.classList.toggle('is-active', n === i));
+    // Restaurant card hover zoom only after reveal finishes, so the transforms don't fight.
+    setTimeout(() => sections[i].querySelectorAll('.rest-card').forEach(c => c.classList.add('is-shown')), 1400);
+    header.classList.toggle('is-solid', i !== 0);
+    if (sections[i].id === 'hero') hero.play(); else hero.pause();
+  }
+
+  /* ---------- Full-page scrolling ---------- */
+  function offsetFor(i) {
+    const max = wrapper.scrollHeight - innerHeight;
+    return Math.min(sections[i].offsetTop, max);
+  }
+
+  function goTo(i, instant) {
+    i = Math.max(0, Math.min(sections.length - 1, i));
+    if (!fpEnabled) {
+      sections[i].scrollIntoView({ behavior: instant || reduceMotion ? 'auto' : 'smooth' });
+      return;
+    }
+    if (i === index && !instant) return;
+    index = i;
+    locked = true;
+    wrapper.classList.toggle('no-transition', !!instant);
+    wrapper.style.transform = `translate3d(0, ${-offsetFor(i)}px, 0)`;
+    activate(i);
+    history.replaceState(null, '', '#' + sections[i].id);
+    // Lock slightly longer than the transition so trackpad inertia doesn't skip a section.
+    setTimeout(() => { locked = false; }, instant ? 0 : 1250);
+  }
+
+  let wheelAcc = 0, wheelTimer;
+  function onWheel(e) {
+    if (!fpEnabled || menu.classList.contains('is-open')) return;
+    e.preventDefault();
+    if (locked) return;
+    wheelAcc += e.deltaY;
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(() => { wheelAcc = 0; }, 150);
+    if (Math.abs(wheelAcc) < 40) return;
+    goTo(index + (wheelAcc > 0 ? 1 : -1));
+    wheelAcc = 0;
+  }
+
+  function onKey(e) {
+    if (!fpEnabled || menu.classList.contains('is-open')) return;
+    if (/input|textarea|select/i.test(e.target.tagName)) return;
+    const next = ['ArrowDown', 'PageDown', ' '].includes(e.key);
+    const prev = ['ArrowUp', 'PageUp'].includes(e.key) || (e.key === ' ' && e.shiftKey);
+    if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+    else if (e.key === 'End') { e.preventDefault(); goTo(sections.length - 1); }
+    else if (prev) { e.preventDefault(); if (!locked) goTo(index - 1); }
+    else if (next) { e.preventDefault(); if (!locked) goTo(index + 1); }
+  }
+
+  let touchX = 0, touchY = 0;
+  function onTouchStart(e) { touchX = e.touches[0].clientX; touchY = e.touches[0].clientY; }
+  function onTouchMove(e) { if (fpEnabled) e.preventDefault(); }
+  function onTouchEnd(e) {
+    const dx = e.changedTouches[0].clientX - touchX;
+    const dy = e.changedTouches[0].clientY - touchY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50 && e.target.closest('.hero')) {
+      dx < 0 ? hero.next() : hero.prev();
+      return;
+    }
+    if (fpEnabled && !locked && Math.abs(dy) > 50) goTo(index + (dy < 0 ? 1 : -1));
+  }
+
+  /* ---------- Normal-scroll fallback (tablet / mobile / short screens) ---------- */
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('is-active');
+    });
+  }, { threshold: 0.2 });
+
+  function onScroll() {
+    if (fpEnabled) return;
+    header.classList.toggle('is-solid', scrollY > sections[0].offsetHeight - 120);
+  }
+
+  function setMode() {
+    const want = fpQuery.matches;
+    if (want === fpEnabled && fpEnabled) { goTo(index, true); return; }
+    fpEnabled = want;
+    root.classList.toggle('fp', fpEnabled);
+    if (fpEnabled) {
+      io.disconnect();
+      window.scrollTo(0, 0);
+      const fromHash = sections.findIndex(s => '#' + s.id === location.hash);
+      index = fromHash > -1 ? fromHash : 0;
+      goTo(index, true);
+    } else {
+      wrapper.style.transform = '';
+      sections.forEach(s => io.observe(s));
+      hero.play();
+      onScroll();
+    }
+  }
+
+  /* ---------- Hero slider ---------- */
+  const hero = (() => {
+    const slides = [...document.querySelectorAll('.hero__slide')];
+    const bar = document.getElementById('heroBar');
+    const current = document.getElementById('heroCurrent');
+    const DURATION = 6000;
+    let i = 0, timer = null;
+    document.getElementById('heroTotal').textContent = slides.length;
+    bar.parentElement.style.setProperty('--autoplay', DURATION + 'ms');
+
+    function show(n) {
+      slides[i].classList.remove('is-current');
+      i = (n + slides.length) % slides.length;
+      slides[i].classList.add('is-current');
+      current.textContent = i + 1;
+      if (timer) restart();
+    }
+    function restart() {
+      clearTimeout(timer);
+      bar.classList.remove('is-running');
+      void bar.offsetWidth;
+      bar.classList.add('is-running');
+      timer = setTimeout(() => show(i + 1), DURATION);
+    }
+    return {
+      next: () => show(i + 1),
+      prev: () => show(i - 1),
+      play() { if (!timer && !reduceMotion) { timer = true; restart(); } },
+      pause() { clearTimeout(timer); timer = null; bar.classList.remove('is-running'); },
+    };
+  })();
+  document.getElementById('heroNext').addEventListener('click', hero.next);
+  document.getElementById('heroPrev').addEventListener('click', hero.prev);
+
+  /* ---------- Instagram marquee: duplicate set for a seamless loop ---------- */
+  const track = document.getElementById('instaTrack');
+  [...track.children].forEach(node => {
+    const clone = node.cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    clone.tabIndex = -1;
+    track.appendChild(clone);
+  });
+
+  /* ---------- Menu overlay ---------- */
+  const menu = document.getElementById('menu');
+  const openBtn = document.getElementById('menuOpen');
+  function toggleMenu(open) {
+    menu.classList.toggle('is-open', open);
+    menu.setAttribute('aria-hidden', String(!open));
+    openBtn.setAttribute('aria-expanded', String(open));
+    if (!fpEnabled) document.body.style.overflow = open ? 'hidden' : '';
+  }
+  openBtn.addEventListener('click', () => toggleMenu(true));
+  document.getElementById('menuClose').addEventListener('click', () => toggleMenu(false));
+  addEventListener('keydown', e => { if (e.key === 'Escape') toggleMenu(false); });
+
+  /* ---------- In-page links ---------- */
+  document.querySelectorAll('[data-goto]').forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      toggleMenu(false);
+      goTo(Number(link.dataset.goto));
+    });
+  });
+
+  addEventListener('wheel', onWheel, { passive: false });
+  addEventListener('keydown', onKey);
+  addEventListener('touchstart', onTouchStart, { passive: true });
+  addEventListener('touchmove', onTouchMove, { passive: false });
+  addEventListener('touchend', onTouchEnd);
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', setMode);
+  fpQuery.addEventListener('change', setMode);
+
+  setMode();
+  // Let the first paint happen before triggering hero entrance.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (fpEnabled) activate(index); else sections[0].classList.add('is-active');
+  }));
+})();
+</script>
+</body>
+</html>
